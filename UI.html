@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8eaf6;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        h1 {
+            color: #5c6bc0;
+        }
+        form {
+            margin-top: 40px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        input[type="file"] {
+            border: 2px solid #c5cae9;
+            padding: 12px;
+            margin-top: 20px;
+            width: 80%;
+            cursor: pointer;
+        }
+        input[type="submit"] {
+            background-color: #5c6bc0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        input[type="submit"]:hover {
+            background-color: #3f51b5;
+        }
+        #result {
+            margin-top: 30px;
+            color: #388e3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wine Test</h1>
+    <form id="fileUploadForm" action="http://ec2-50-16-124-144.compute-1.amazonaws.com:5000/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileUploader" accept=".csv">
+        <input type="submit" value="Analyze Wine">
+    </form>
+    <p id="result" style="display: none;"></p>
+
+    <script>
+        document.getElementById("fileUploadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const fileUploader = document.getElementById("fileUploader");
+            const file = fileUploader.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("http://ec2-50-16-124-144.compute-1.amazonaws.com:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDisplay = document.getElementById("result");
+                resultDisplay.innerHTML = "Predicted F1 Score: " + data.f1_score;
+                resultDisplay.style.display = "block";
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
